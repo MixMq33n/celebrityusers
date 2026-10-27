@@ -129,6 +129,8 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outl
 .idx { font-family: var(--display); font-size: 10.5px; color: var(--gold); font-weight: 700; letter-spacing: .04em; }
 .card h3 { margin: 4px 0 0; font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: -.01em; overflow-wrap: anywhere; }
 .price { font-family: var(--display); font-weight: 800; font-size: 18px; color: var(--gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pricebox { text-align: right; flex: none; }
+.was { margin-top: 2px; font-size: 12px; color: var(--muted); text-decoration: line-through; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .stack { display: flex; align-items: center; margin-top: 12px; position: relative; }
 .stack span {
   width: 30px; height: 30px; border-radius: 50%; margin-left: -9px; border: 2px solid var(--raised);
@@ -369,13 +371,19 @@ window.addEventListener("error", function (e) {
 
   const rub = (n) => n.toLocaleString("ru-RU") + " ₽";
 
-  /* что выбрано: контакты выбранных паков плюс отдельные, без повторов */
-  function covered() {
-    const s = new Set(selKeys);
-    for (const p of data.packs) if (selPacks.has(p.key)) p.contacts.forEach((c) => s.add(c.k));
-    return s;
+  /* что выбрано: цены выбранных паков плюс отдельные контакты вне этих паков.
+     Тот же расчёт делает бот, поэтому сумма здесь и в счёте совпадает. */
+  function selection() {
+    const inPacks = new Set();
+    let packsSum = 0;
+    for (const p of data.packs) {
+      if (!selPacks.has(p.key)) continue;
+      packsSum += p.price;
+      p.contacts.forEach((c) => inPacks.add(c.k));
+    }
+    const singles = [...selKeys].filter((k) => !inPacks.has(k));
+    return { inPacks, packsSum, singles, count: inPacks.size + singles.length, total: packsSum + singles.length * data.price };
   }
-  const packOf = (key) => (contactsByKey.get(key) || {}).pack;
 
   /* вкладки */
   function moveInd() {
@@ -416,7 +424,11 @@ window.addEventListener("error", function (e) {
       const top = el("div", "card-top");
       const left = el("div");
       left.append(el("div", "idx", "ПАК № " + pad(i + 1)), el("h3", "", p.name));
-      top.append(left, el("div", "price", rub(p.contacts.length * data.price)));
+      const right = el("div", "pricebox");
+      right.append(el("div", "price", rub(p.price)));
+      const alone = p.contacts.length * data.price;
+      if (alone > p.price) right.append(el("div", "was", rub(alone)));  // во сколько обошлись бы те же контакты по одному
+      top.append(left, right);
       const stack = el("div", "stack");
       p.contacts.slice(0, 3).forEach((c) => stack.append(el("span", "", initials(c.n))));
       stack.append(el("small", "", contactsWord(p.contacts.length)));
@@ -440,8 +452,7 @@ window.addEventListener("error", function (e) {
   function renderSingles() {
     const list = $("clist"), state = $("state");
     const q = query.trim().replace(/^@/, "").toLowerCase();
-    const viaPack = new Set();
-    for (const p of data.packs) if (selPacks.has(p.key)) viaPack.add(p.key);
+    const inPacks = selection().inPacks;
     list.replaceChildren();
     let shown = 0;
     for (const p of data.packs) {
@@ -450,7 +461,7 @@ window.addEventListener("error", function (e) {
         if (q && !c.n.toLowerCase().includes(q)) continue;
         shown++;
         const li = el("li");
-        const covered = viaPack.has(p.key);
+        const covered = inPacks.has(c.k);
         const row = el("button", "crow" + (covered ? " via-pack" : ""));
         row.dataset.k = c.k;
         row.setAttribute("aria-pressed", String(covered || selKeys.has(c.k)));
@@ -471,7 +482,7 @@ window.addEventListener("error", function (e) {
     const row = e.target.closest(".crow");
     if (!row) return;
     const k = row.dataset.k;
-    if (selPacks.has(packOf(k))) { toast("Этот контакт уже входит в выбранный пак"); return; }
+    if (selection().inPacks.has(k)) { toast("Этот контакт уже входит в выбранный пак"); return; }
     selKeys.has(k) ? selKeys.delete(k) : selKeys.add(k);
     tap(); renderSingles(); updateDock(true);
   });
@@ -484,10 +495,10 @@ window.addEventListener("error", function (e) {
 
   /* корзина */
   function updateDock(bump) {
-    const n = covered().size;
+    const s = selection(), n = s.count;
     $("dock-sum").textContent = n ? contactsWord(n) + " в заявке" : "Заявка пуста";
-    countTo($("dock-total"), shownTotal, n * data.price, 480);
-    shownTotal = n * data.price;
+    countTo($("dock-total"), shownTotal, s.total, 480);
+    shownTotal = s.total;
     $("dock").classList.toggle("on", n > 0);
     if (bump && n) { $("dock").classList.remove("bump"); void $("dock").offsetWidth; $("dock").classList.add("bump"); }
   }
@@ -526,14 +537,15 @@ window.addEventListener("error", function (e) {
 
   function openPack(p) {
     const inCart = selPacks.has(p.key);
-    const total = p.contacts.length * data.price;
+    const total = p.price;
+    const alone = p.contacts.length * data.price;
     openSheet({
       kicker: "Пак № " + pad(data.packs.indexOf(p) + 1),
       title: p.name,
       desc: contactsWord(p.contacts.length) + ". Ники видны, юзернеймы откроются после оплаты.",
       rows: p.contacts.map((c) => { const li = el("li"); li.append(el("b", "", c.n), el("span", "lock", "🔒 @••••••")); return li; }),
       total: rub(total),
-      note: "Один контакт стоит " + rub(data.price) + ", пак стоит столько, сколько в нём контактов.",
+      note: alone > total ? "Те же контакты по одному стоили бы " + rub(alone) + "." : "Один контакт стоит " + rub(data.price) + ".",
       primaryText: inCart ? "Убрать из заявки" : "Добавить в заявку · " + rub(total),
       primaryLine: inCart,
       secondaryText: "Закрыть",
@@ -551,29 +563,28 @@ window.addEventListener("error", function (e) {
   });
 
   function openOrder() {
-    const keys = covered();
-    if (!keys.size) return;
+    const s = selection();
+    if (!s.count) return;
     const rows = [];
     for (const p of data.packs) {
       if (!selPacks.has(p.key)) continue;
       const li = el("li");
-      li.append(el("b", "", p.name + " · " + contactsWord(p.contacts.length)), el("span", "amt", rub(p.contacts.length * data.price)));
+      li.append(el("b", "", p.name + " · " + contactsWord(p.contacts.length)), el("span", "amt", rub(p.price)));
       rows.push(li);
     }
-    const singles = [...selKeys].filter((k) => !selPacks.has(packOf(k)));
-    if (singles.length) {
+    if (s.singles.length) {
       const li = el("li");
-      li.append(el("b", "", "Отдельные: " + contactsWord(singles.length)), el("span", "amt", rub(singles.length * data.price)));
+      li.append(el("b", "", "Отдельные: " + contactsWord(s.singles.length)), el("span", "amt", rub(s.singles.length * data.price)));
       rows.push(li);
     }
     openSheet({
       kicker: "Заявка",
       title: "Проверьте состав",
-      desc: "Повторяющиеся контакты считаются один раз.",
+      desc: "Если один человек есть в двух паках, его юзернейм придёт один раз.",
       rows,
-      total: rub(keys.size * data.price),
+      total: rub(s.total),
       note: "После оплаты бот пришлёт юзернеймы в чат и файлом.",
-      primaryText: "Оплатить · " + rub(keys.size * data.price),
+      primaryText: "Оплатить · " + rub(s.total),
       secondaryText: "Продолжить выбор",
       primary: checkout,
     });
@@ -582,8 +593,10 @@ window.addEventListener("error", function (e) {
 
   function checkout() {
     if (!inTelegram) { toast("Откройте витрину в Telegram, чтобы оплатить"); return; }
+    const data4tg = JSON.stringify({ v: 1, packs: [...selPacks], contacts: selection().singles });
+    if (data4tg.length > 3800) { toast("Слишком много отдельных контактов: выберите паки"); return; }  // Telegram принимает до 4096 байт
     try {
-      tg.sendData(JSON.stringify({ v: 1, packs: [...selPacks], contacts: [...selKeys] }));
+      tg.sendData(data4tg);
     } catch (e) {
       toast("Откройте витрину кнопкой «🛍 Открыть витрину» под чатом");
     }
