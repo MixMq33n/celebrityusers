@@ -1,25 +1,504 @@
 {
  "bot": "celebrityusers_bot",
- "items": [
+ "price": 25,
+ "packs": [
   {
-   "u": "primer_one",
-   "p": 3000
+   "key": "Киберспортсмены CS2",
+   "name": "Киберспортсмены CS2",
+   "contacts": [
+    {
+     "k": "alkaren",
+     "n": "Alkaren"
+    },
+    {
+     "k": "artfrost",
+     "n": "ArtFrost"
+    },
+    {
+     "k": "aw",
+     "n": "AW"
+    },
+    {
+     "k": "aliot",
+     "n": "Aliot"
+    },
+    {
+     "k": "alpha",
+     "n": "alpha"
+    },
+    {
+     "k": "anastaze",
+     "n": "anastaze"
+    },
+    {
+     "k": "ax1le",
+     "n": "Ax1Le"
+    },
+    {
+     "k": "b1t",
+     "n": "b1t"
+    },
+    {
+     "k": "b1st",
+     "n": "b1st"
+    },
+    {
+     "k": "b1ad3",
+     "n": "B1ad3"
+    },
+    {
+     "k": "belchonokk",
+     "n": "BELCHONOKK"
+    },
+    {
+     "k": "boombl4",
+     "n": "Boombl4"
+    },
+    {
+     "k": "chopper",
+     "n": "chopper"
+    },
+    {
+     "k": "cptkurtka023",
+     "n": "cptkurtka023"
+    },
+    {
+     "k": "donk",
+     "n": "donk"
+    },
+    {
+     "k": "dastan",
+     "n": "dastan"
+    },
+    {
+     "k": "dosia",
+     "n": "Dosia"
+    },
+    {
+     "k": "demqq",
+     "n": "DemQQ"
+    },
+    {
+     "k": "fear",
+     "n": "fear"
+    },
+    {
+     "k": "fl4mus",
+     "n": "FL4MUS"
+    },
+    {
+     "k": "flamie",
+     "n": "flamie"
+    },
+    {
+     "k": "fl1t",
+     "n": "FL1T"
+    },
+    {
+     "k": "flouzer",
+     "n": "flouzer"
+    },
+    {
+     "k": "ryujin",
+     "n": "Ryujin"
+    },
+    {
+     "k": "h4san4tor",
+     "n": "H4SAN4TOR"
+    },
+    {
+     "k": "hally",
+     "n": "hally"
+    },
+    {
+     "k": "headtr1ck",
+     "n": "headtr1ck"
+    },
+    {
+     "k": "heavygod",
+     "n": "HeavyGod"
+    },
+    {
+     "k": "jame",
+     "n": "Jame"
+    },
+    {
+     "k": "jakasmo",
+     "n": "jakasmo"
+    },
+    {
+     "k": "jamb0",
+     "n": "jamb0"
+    },
+    {
+     "k": "kashl1d",
+     "n": "kashl1d"
+    },
+    {
+     "k": "kalash",
+     "n": "kAlash"
+    },
+    {
+     "k": "kelien",
+     "n": "kelieN"
+    },
+    {
+     "k": "kenzor",
+     "n": "kenzor"
+    },
+    {
+     "k": "khan",
+     "n": "khaN"
+    },
+    {
+     "k": "kvem",
+     "n": "Kvem"
+    },
+    {
+     "k": "kyossa",
+     "n": "kyossa"
+    },
+    {
+     "k": "krabeni",
+     "n": "Krabeni"
+    },
+    {
+     "k": "magnojez",
+     "n": "Magnojez"
+    },
+    {
+     "k": "m0nesy",
+     "n": "m0NESY"
+    },
+    {
+     "k": "nafanya",
+     "n": "nafanya"
+    },
+    {
+     "k": "notineki",
+     "n": "notineki"
+    },
+    {
+     "k": "nipl",
+     "n": "nipl"
+    },
+    {
+     "k": "perfecto",
+     "n": "Perfecto"
+    },
+    {
+     "k": "qikert",
+     "n": "Qikert"
+    },
+    {
+     "k": "qw1nk1",
+     "n": "qw1nk1"
+    },
+    {
+     "k": "sdaim",
+     "n": "Sdaim"
+    },
+    {
+     "k": "r3salt",
+     "n": "r3salt"
+    },
+    {
+     "k": "s1mple",
+     "n": "s1mple"
+    },
+    {
+     "k": "sl4m",
+     "n": "SL4M"
+    },
+    {
+     "k": "sellter",
+     "n": "SELLTER"
+    },
+    {
+     "k": "sdy",
+     "n": "sdy"
+    },
+    {
+     "k": "sstinix",
+     "n": "sstiNiX"
+    },
+    {
+     "k": "syph0",
+     "n": "SYPH0"
+    },
+    {
+     "k": "s1ren",
+     "n": "s1ren"
+    },
+    {
+     "k": "sugar",
+     "n": "sugaR"
+    },
+    {
+     "k": "tnir",
+     "n": "tNIR"
+    },
+    {
+     "k": "woro2k",
+     "n": "Woro2K"
+    },
+    {
+     "k": "xeedo",
+     "n": "xeedo"
+    },
+    {
+     "k": "xielo",
+     "n": "xiELO"
+    },
+    {
+     "k": "yekindar",
+     "n": "YEKINDAR"
+    },
+    {
+     "k": "yxngstxr",
+     "n": "yxngstxr"
+    },
+    {
+     "k": "xia",
+     "n": "xia"
+    },
+    {
+     "k": "zweih",
+     "n": "zweih"
+    }
+   ]
   },
   {
-   "u": "demo_name",
-   "p": 4500
+   "key": "Стримеры и блогеры CS2",
+   "name": "Стримеры и блогеры CS2",
+   "contacts": [
+    {
+     "k": "baz",
+     "n": "baz"
+    },
+    {
+     "k": "breel",
+     "n": "Breel"
+    },
+    {
+     "k": "closetape",
+     "n": "closetape"
+    },
+    {
+     "k": "delight",
+     "n": "Delight"
+    },
+    {
+     "k": "em0k1d",
+     "n": "em0k1d"
+    },
+    {
+     "k": "fander",
+     "n": "fANDER"
+    },
+    {
+     "k": "focus",
+     "n": "focus"
+    },
+    {
+     "k": "fenya",
+     "n": "Fenya"
+    },
+    {
+     "k": "getlight",
+     "n": "GETLIGHT"
+    },
+    {
+     "k": "harumi",
+     "n": "harumi"
+    },
+    {
+     "k": "hooch",
+     "n": "hooch"
+    },
+    {
+     "k": "poseidonskiy",
+     "n": "poseidonskiy"
+    },
+    {
+     "k": "lent",
+     "n": "Lent"
+    },
+    {
+     "k": "james banks",
+     "n": "James Banks"
+    },
+    {
+     "k": "inside",
+     "n": "INSIDE"
+    },
+    {
+     "k": "irbitka",
+     "n": "irbitka"
+    },
+    {
+     "k": "m3wsu",
+     "n": "m3wsu"
+    },
+    {
+     "k": "megarush",
+     "n": "MegaRush"
+    },
+    {
+     "k": "moregames",
+     "n": "MoreGames"
+    },
+    {
+     "k": "oblome",
+     "n": "Oblome"
+    },
+    {
+     "k": "overdrive",
+     "n": "OverDrive"
+    },
+    {
+     "k": "shucarz",
+     "n": "shucarz"
+    },
+    {
+     "k": "strogo",
+     "n": "StRoGo"
+    },
+    {
+     "k": "tride",
+     "n": "tride"
+    },
+    {
+     "k": "raiz",
+     "n": "RAIZ"
+    },
+    {
+     "k": "yariksupra",
+     "n": "yariksupra"
+    },
+    {
+     "k": "zernovka",
+     "n": "Zernovka"
+    },
+    {
+     "k": "zoner",
+     "n": "zoneR"
+    }
+   ]
   },
   {
-   "u": "sample77",
-   "p": 1500
+   "key": "Dota 2",
+   "name": "Dota 2",
+   "contacts": [
+    {
+     "k": "alohadance",
+     "n": "ALOHADANCE"
+    },
+    {
+     "k": "dukalis",
+     "n": "Dukalis"
+    },
+    {
+     "k": "collapse",
+     "n": "Collapse"
+    },
+    {
+     "k": "ramzes666",
+     "n": "RAMZES666"
+    },
+    {
+     "k": "iltw",
+     "n": "ILTW"
+    },
+    {
+     "k": "rue",
+     "n": "rue"
+    },
+    {
+     "k": "korb3n",
+     "n": "Korb3n"
+    },
+    {
+     "k": "torontotokyo",
+     "n": "TORONTOTOKYO"
+    },
+    {
+     "k": "malr1ne",
+     "n": "Malr1ne"
+    },
+    {
+     "k": "meeponegeroi",
+     "n": "Meeponegeroi"
+    },
+    {
+     "k": "miposhka",
+     "n": "Miposhka"
+    },
+    {
+     "k": "nightfall",
+     "n": "Nightfall"
+    },
+    {
+     "k": "not me",
+     "n": "not me"
+    },
+    {
+     "k": "lukawa",
+     "n": "Lukawa"
+    },
+    {
+     "k": "panto",
+     "n": "panto"
+    }
+   ]
   },
   {
-   "u": "test_brand",
-   "p": 12000
+   "key": "Valorant",
+   "name": "Valorant",
+   "contacts": [
+    {
+     "k": "chronicle",
+     "n": "Chronicle"
+    },
+    {
+     "k": "shao",
+     "n": "Shao"
+    },
+    {
+     "k": "redgar",
+     "n": "Redgar"
+    },
+    {
+     "k": "relaxcis",
+     "n": "relaxcis"
+    },
+    {
+     "k": "pa1ka",
+     "n": "pa1ka"
+    },
+    {
+     "k": "purp0",
+     "n": "purp0"
+    },
+    {
+     "k": "ketwil",
+     "n": "Ketwil"
+    }
+   ]
   },
   {
-   "u": "my_shop_ru",
-   "p": 2500
+   "key": "Fortnite",
+   "name": "Fortnite",
+   "contacts": [
+    {
+     "k": "lilput",
+     "n": "Lilput"
+    },
+    {
+     "k": "merstach",
+     "n": "Merstach"
+    }
+   ]
   }
  ]
 }
