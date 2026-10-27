@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Юзернеймы</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Onest:wght@400;500;600;700&display=swap">
+<style>
+/* Тёмно-золотая витрина: Unbounded для заголовков и цен, Onest для текста */
+:root {
+  --bg: #0a0b0d;
+  --surface: #131418;
+  --raised: #1b1c21;
+  --ink: #f4f1ea;
+  --muted: #8e8f97;
+  --line: #26272d;
+  --gold: #f2b233;
+  --gold-soft: #ffd27a;
+  --gold-ink: #15110a;
+  --glow: rgba(242, 178, 51, .3);
+  --display: "Unbounded", "Arial Black", sans-serif;
+  --text: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --spring: cubic-bezier(.34, 1.45, .64, 1);
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --raised: #f5f4f0;
+  --ink: #121212;
+  --muted: #6b6b6b;
+  --line: #e6e4de;
+  --gold: #b57d0c;
+  --gold-soft: #d9a441;
+  --gold-ink: #ffffff;
+  --glow: rgba(181, 125, 12, .25);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body {
+  font-family: var(--text); font-size: 15px; line-height: 1.45; min-height: 100dvh;
+  overflow-x: hidden;
+}
+button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* свет и зерно на фоне */
+.orb { position: fixed; border-radius: 50%; filter: blur(70px); opacity: .2; pointer-events: none; z-index: 0; }
+.orb.a { width: 260px; height: 260px; background: var(--gold); top: -100px; right: -90px; animation: drift 16s ease-in-out infinite alternate; }
+.orb.b { width: 220px; height: 220px; background: var(--gold-soft); bottom: 60px; left: -110px; opacity: .13; animation: drift 19s ease-in-out infinite alternate-reverse; }
+@keyframes drift { to { transform: translate(-30px, 40px) scale(1.08); } }
+.grain {
+  position: fixed; inset: 0; z-index: 30; pointer-events: none; opacity: .05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.app { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; padding: 0 18px calc(40px + env(safe-area-inset-bottom)); }
+
+/* шапка */
+.topbar {
+  position: sticky; top: 0; z-index: 7; display: flex; align-items: center; gap: 12px;
+  margin: 0 -18px; padding: calc(14px + env(safe-area-inset-top)) 18px 12px;
+  background: linear-gradient(var(--bg) 72%, transparent);
+}
+.logo {
+  width: 40px; height: 40px; border-radius: 13px; flex: none; display: grid; place-items: center;
+  background: linear-gradient(145deg, var(--gold-soft), var(--gold)); color: var(--gold-ink);
+  font-family: var(--display); font-weight: 800; font-size: 17px; box-shadow: 0 10px 24px -8px var(--glow);
+}
+.topbar .t { font-family: var(--display); font-weight: 700; font-size: 14px; }
+.topbar .s { font-size: 12px; color: var(--muted); }
+.theme-btn {
+  margin-left: auto; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line);
+  background: var(--raised); display: grid; place-items: center; font-size: 16px;
+  transition: transform .3s var(--spring), background .4s var(--ease);
+}
+.theme-btn:active { transform: scale(.9) rotate(20deg); }
+
+/* заголовок */
+.kicker { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-weight: 600; display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.live { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); animation: ping 2s infinite; }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 var(--glow); } 70%, 100% { box-shadow: 0 0 0 9px transparent; } }
+.h1 { font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1.06; margin: 8px 0 18px; letter-spacing: -.02em; text-wrap: balance; }
+.h1 em { font-style: normal; color: var(--gold); }
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: .1em; }
+.w > span { display: inline-block; transform: translateY(105%); }
+.shown .w > span { animation: word .85s var(--ease) forwards; animation-delay: calc(var(--i) * 70ms + 100ms); }
+@keyframes word { to { transform: none; } }
+
+/* поиск и сортировка */
+.search {
+  display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 14px; margin-bottom: 12px;
+  background: var(--raised); border: 1px solid var(--line); border-radius: 14px; transition: border-color .3s;
+}
+.search:focus-within { border-color: var(--gold); }
+.search svg { flex: none; color: var(--muted); }
+.search input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: none; color: var(--ink); font: inherit; }
+.search input::placeholder { color: var(--muted); }
+.tabs { position: relative; display: flex; gap: 4px; padding: 4px; border-radius: 14px; background: var(--raised); margin-bottom: 18px; border: 1px solid var(--line); }
+.tabs .ind {
+  position: absolute; top: 4px; bottom: 4px; left: 4px; width: 0; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--line);
+  transition: transform .5s var(--ease), width .5s var(--ease);
+}
+.tab { position: relative; flex: 1; padding: 9px 2px; font-size: 12.5px; font-weight: 600; color: var(--muted); z-index: 1; transition: color .3s; white-space: nowrap; }
+.tab[aria-selected="true"] { color: var(--ink); }
+
+/* карточки */
+.card {
+  --mx: 50%; --my: 0%; --rx: 0deg; --ry: 0deg;
+  position: relative; display: block; width: 100%; text-align: left; overflow: hidden;
+  padding: 16px; margin-bottom: 12px; border-radius: 22px; background: var(--raised); border: 1px solid var(--line);
+  transform: perspective(700px) rotateX(var(--rx)) rotateY(var(--ry));
+  transition: transform .5s var(--ease), border-color .4s, box-shadow .4s;
+  animation: rise .7s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 80ms + 60ms);
+}
+.card::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s;
+  background: radial-gradient(240px circle at var(--mx) var(--my), var(--glow), transparent 62%);
+}
+@media (hover: hover) {
+  .card:hover::before { opacity: 1; }
+  .card:hover { border-color: color-mix(in srgb, var(--gold) 50%, var(--line)); box-shadow: 0 20px 40px -26px rgba(0, 0, 0, .6); }
+}
+.card:active { transform: scale(.985); }
+.card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; position: relative; }
+.idx { font-family: var(--display); font-size: 10.5px; color: var(--gold); font-weight: 700; letter-spacing: .04em; }
+.card h3 { margin: 4px 0 0; font-family: var(--display); font-weight: 700; font-size: 17px; letter-spacing: -.01em; overflow-wrap: anywhere; }
+.card h3 i, .sheet h2 i { font-style: normal; color: var(--gold); }
+.price { font-family: var(--display); font-weight: 800; font-size: 18px; color: var(--gold); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.chips { display: flex; gap: 8px; margin-top: 12px; position: relative; }
+.chip { font-size: 12px; color: var(--muted); padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); }
+
+.state { text-align: center; color: var(--muted); padding: 40px 8px; }
+.state b { display: block; color: var(--ink); font-family: var(--display); font-size: 16px; margin-bottom: 8px; }
+.state button { margin-top: 16px; height: 42px; padding: 0 20px; border-radius: 12px; border: 1px solid var(--line); background: var(--raised); color: var(--ink); }
+.skel { height: 112px; border-radius: 22px; margin-bottom: 12px; border: 1px solid var(--line); background: linear-gradient(90deg, var(--raised) 30%, var(--line) 50%, var(--raised) 70%) 0 0 / 300% 100%; animation: shim 1.3s linear infinite; }
+@keyframes shim { to { background-position: -300% 0; } }
+@keyframes rise { from { opacity: 0; transform: translateY(12px) scale(.98); filter: blur(4px); } to { opacity: 1; transform: none; filter: blur(0); } }
+
+/* кнопка */
+.btn {
+  position: relative; overflow: hidden; width: 100%; border-radius: 14px; padding: 15px;
+  font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: .02em;
+  background: var(--gold); color: var(--gold-ink); box-shadow: 0 12px 30px -10px var(--glow);
+  transition: transform .35s var(--spring), box-shadow .3s var(--ease); will-change: transform;
+}
+.btn::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .5) 50%, transparent 65%);
+  transform: translateX(-130%); animation: sweep 3.4s var(--ease) infinite;
+}
+@keyframes sweep { 0%, 55% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
+.btn:active { transform: scale(.97); }
+.ghost { width: 100%; border: 1px solid var(--line); border-radius: 14px; padding: 14px; font-size: 14.5px; margin-top: 10px; color: var(--muted); }
+
+/* карточка покупки */
+.scrim { position: fixed; inset: 0; z-index: 20; background: rgba(0, 0, 0, .55); opacity: 0; pointer-events: none; transition: opacity .4s var(--ease); }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; max-width: 480px; margin: 0 auto; max-height: 90%;
+  overflow-y: auto; scrollbar-width: none; background: var(--surface); border-top: 1px solid var(--line);
+  border-radius: 30px 30px 0 0; padding: 12px 20px calc(20px + env(safe-area-inset-bottom));
+  transform: translateY(105%); visibility: hidden; transition: transform .6s var(--ease), visibility 0s .6s;
+  box-shadow: 0 -24px 50px -24px rgba(0, 0, 0, .6);
+}
+.sheet.open { transform: none; visibility: visible; transition: transform .6s var(--ease), visibility 0s; }
+.grab { width: 44px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 16px; cursor: grab; touch-action: none; }
+.sheet .kicker { margin: 0 0 6px; }
+.sheet h2 { font-family: var(--display); font-weight: 800; font-size: 26px; margin: 0 0 8px; letter-spacing: -.02em; overflow-wrap: anywhere; line-height: 1.1; }
+.sheet .desc { color: var(--muted); margin: 0 0 14px; font-size: 14px; }
+.facts { list-style: none; margin: 0; padding: 0; }
+.facts li { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; opacity: 0; transform: translateX(-10px); }
+.sheet.open .facts li { animation: rise-x .55s var(--ease) forwards; animation-delay: calc(var(--i) * 70ms + 240ms); }
+@keyframes rise-x { to { opacity: 1; transform: none; } }
+.facts span { color: var(--muted); }
+.facts b { font-weight: 600; text-align: right; }
+.facts .sum b { font-family: var(--display); font-weight: 800; color: var(--gold); font-size: 17px; font-variant-numeric: tabular-nums; }
+.note { font-size: 12.5px; color: var(--muted); margin: 12px 0 0; }
+.sheet .btn { margin-top: 16px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .w > span, .facts li { transform: none; opacity: 1; }
+}
+</style>
+</head>
+<body>
+<div class="orb a" aria-hidden="true"></div>
+<div class="orb b" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="app">
+  <header class="topbar">
+    <div class="logo" aria-hidden="true">@</div>
+    <div>
+      <div class="t">Юзернеймы</div>
+      <div class="s" id="count">загружаем…</div>
+    </div>
+    <button class="theme-btn" id="theme" aria-label="Переключить тему">◐</button>
+  </header>
+
+  <main>
+    <div class="kicker"><span class="live" aria-hidden="true"></span>Витрина · в наличии</div>
+    <h1 class="h1" id="title">Готовые <em>юзернеймы</em></h1>
+
+    <label class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Поиск по имени" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Поиск по имени">
+    </label>
+    <div class="tabs" role="tablist" id="tabs">
+      <span class="ind" id="ind"></span>
+      <button class="tab" role="tab" aria-selected="true" data-sort="list">Все</button>
+      <button class="tab" role="tab" aria-selected="false" data-sort="asc">Дешевле</button>
+      <button class="tab" role="tab" aria-selected="false" data-sort="desc">Дороже</button>
+      <button class="tab" role="tab" aria-selected="false" data-sort="len">Короче</button>
+    </div>
+
+    <div id="list" aria-live="polite"></div>
+    <div class="state" id="state" hidden></div>
+  </main>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+  <div class="grab" id="grab" aria-hidden="true"></div>
+  <div class="kicker" id="sheet-kicker"></div>
+  <h2 id="sheet-title"></h2>
+  <p class="desc">Имя свободно. Оплата проходит через СБП в одно касание.</p>
+  <ul class="facts">
+    <li style="--i:0"><span>Длина</span><b id="f-len"></b></li>
+    <li style="--i:1"><span>Закрепление</span><b>30 минут на оплату</b></li>
+    <li style="--i:2" class="sum"><span>К оплате</span><b id="f-price"></b></li>
+  </ul>
+  <p class="note">После оплаты бот пришлёт подтверждение, а администратор передаст имя.</p>
+  <button class="btn" id="buy">Купить</button>
+  <button class="ghost" id="cancel">Отмена</button>
+</div>
+
+<script>
+(function () {
+  const tg = window.Telegram && window.Telegram.WebApp;
+  const root = document.documentElement;
+  const $ = (id) => document.getElementById(id);
+  const rub = (n) => n.toLocaleString("ru-RU") + " ₽";
+  const pad = (n) => String(n).padStart(2, "0");
+  const symbols = (n) => {
+    const a = n % 10, b = n % 100;
+    return n + (a === 1 && b !== 11 ? " символ" : (a >= 2 && a <= 4 && (b < 12 || b > 14)) ? " символа" : " символов");
+  };
+  const tap = () => { try { tg && tg.HapticFeedback.impactOccurred("light"); } catch (e) {} };
+
+  /* тема: по умолчанию тёмно-золотая, выбор запоминается */
+  function paintTelegram() {
+    const c = root.dataset.theme === "light" ? "#ffffff" : "#0a0b0d";
+    try { tg.setHeaderColor(c); tg.setBackgroundColor(c); } catch (e) {}
+  }
+  try { const t = localStorage.getItem("shop-theme"); if (t === "light" || t === "dark") root.dataset.theme = t; } catch (e) {}
+  if (tg) { tg.ready(); tg.expand(); paintTelegram(); }
+  $("theme").addEventListener("click", () => {
+    root.dataset.theme = root.dataset.theme === "light" ? "dark" : "light";
+    try { localStorage.setItem("shop-theme", root.dataset.theme); } catch (e) {}
+    paintTelegram();
+    tap();
+  });
+
+  /* заголовок: слова выезжают из-под маски */
+  const title = $("title");
+  title.innerHTML = title.innerHTML.trim().split(/\s+/)
+    .map((w, i) => '<span class="w" style="--i:' + i + '"><span>' + w + "</span></span>").join(" ");
+  title.classList.add("shown");
+
+  let data = { bot: "", items: [] };
+  let sort = "list", query = "", current = null;
+
+  function visible() {
+    const q = query.trim().replace(/^@/, "").toLowerCase();
+    const items = data.items.filter((it) => !q || it.u.toLowerCase().includes(q));
+    if (sort === "asc") items.sort((a, b) => a.p - b.p);
+    if (sort === "desc") items.sort((a, b) => b.p - a.p);
+    if (sort === "len") items.sort((a, b) => a.u.length - b.u.length || a.p - b.p);
+    return items;
+  }
+
+  function tilt(card) {
+    card.addEventListener("pointermove", (e) => {
+      if (e.pointerType !== "mouse") return;
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width, py = (e.clientY - r.top) / r.height;
+      card.style.setProperty("--mx", px * 100 + "%");
+      card.style.setProperty("--my", py * 100 + "%");
+      card.style.setProperty("--ry", (px - 0.5) * 6 + "deg");
+      card.style.setProperty("--rx", (0.5 - py) * 5 + "deg");
+    });
+    card.addEventListener("pointerleave", () => {
+      card.style.setProperty("--rx", "0deg");
+      card.style.setProperty("--ry", "0deg");
+    });
+  }
+
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function render() {
+    const list = $("list"), state = $("state");
+    const items = visible();
+    list.replaceChildren();
+    items.forEach((it, i) => {
+      const card = el("button", "card");
+      card.style.setProperty("--i", Math.min(i, 8));
+      card.dataset.u = it.u;
+      const top = el("div", "card-top");
+      const left = el("div");
+      left.append(el("div", "idx", "ИМЯ № " + pad(it.n)));
+      const h = el("h3");
+      h.append(el("i", "", "@"), it.u);
+      left.append(h);
+      top.append(left, el("div", "price", rub(it.p)));
+      const chips = el("div", "chips");
+      chips.append(el("span", "chip", symbols(it.u.length)), el("span", "chip", "СБП"));
+      card.append(top, chips);
+      tilt(card);
+      list.append(card);
+    });
+    if (items.length === 0) {
+      showState(data.items.length ? "Ничего не найдено" : "Все имена раскуплены",
+                data.items.length ? "Попробуйте другое слово." : "Загляните позже: витрина пополняется.");
+    } else {
+      state.hidden = true;
+    }
+    $("count").textContent = data.items.length ? "свободно: " + data.items.length : "витрина пуста";
+  }
+
+  function showState(titleText, text, retry) {
+    const state = $("state");
+    state.replaceChildren(el("b", "", titleText), text);
+    if (retry) {
+      const btn = el("button", "", "Повторить");
+      btn.onclick = load;
+      state.append(document.createElement("br"), btn);
+    }
+    state.hidden = false;
+  }
+
+  function skeleton() {
+    $("list").replaceChildren(...Array.from({ length: 4 }, () => el("div", "skel")));
+    $("state").hidden = true;
+  }
+
+  async function load() {
+    if (!data.items.length) skeleton();
+    try {
+      const r = await fetch("catalog.json?t=" + Date.now(), { cache: "no-store" });
+      if (!r.ok) throw new Error(r.status);
+      data = await r.json();
+      data.items.forEach((it, i) => { it.n = i + 1; });
+      render();
+    } catch (e) {
+      $("list").replaceChildren();
+      $("count").textContent = "нет связи";
+      showState("Не удалось загрузить", "Проверьте интернет и попробуйте ещё раз.", true);
+    }
+  }
+
+  /* сортировка: бегунок плавно переезжает */
+  function moveInd() {
+    const sel = document.querySelector(".tab[aria-selected='true']");
+    const ind = $("ind");
+    ind.style.width = sel.offsetWidth + "px";
+    ind.style.transform = "translateX(" + (sel.offsetLeft - 4) + "px)";
+  }
+  $("tabs").addEventListener("click", (e) => {
+    const tab = e.target.closest(".tab");
+    if (!tab) return;
+    sort = tab.dataset.sort;
+    document.querySelectorAll(".tab").forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+    moveInd(); tap(); render();
+  });
+  $("q").addEventListener("input", (e) => { query = e.target.value; render(); });
+  window.addEventListener("resize", moveInd);
+
+  /* карточка покупки */
+  function openSheet(name) {
+    const it = data.items.find((x) => x.u === name);
+    if (!it) return;
+    current = it;
+    $("sheet-kicker").textContent = "Имя № " + pad(it.n);
+    const h = $("sheet-title");
+    h.replaceChildren(el("i", "", "@"), it.u);
+    $("f-len").textContent = symbols(it.u.length);
+    $("f-price").textContent = rub(it.p);
+    $("buy").textContent = "Купить · " + rub(it.p);
+    const sheet = $("sheet");
+    sheet.classList.remove("open"); void sheet.offsetWidth;
+    sheet.classList.add("open");
+    $("scrim").classList.add("on");
+    tap();
+  }
+  function closeSheet() {
+    $("sheet").classList.remove("open");
+    $("scrim").classList.remove("on");
+    current = null;
+  }
+  function buy() {
+    if (!current) return;
+    const url = "https://t.me/" + data.bot + "?start=buy_" + encodeURIComponent(current.u);
+    tap();
+    if (tg && tg.openTelegramLink) {
+      tg.openTelegramLink(url);
+      setTimeout(() => tg.close(), 250);
+    } else {
+      window.open(url, "_blank");
+    }
+  }
+  $("list").addEventListener("click", (e) => {
+    const card = e.target.closest(".card");
+    if (card) openSheet(card.dataset.u);
+  });
+  $("buy").addEventListener("click", buy);
+  $("cancel").addEventListener("click", closeSheet);
+  $("scrim").addEventListener("click", closeSheet);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSheet(); });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+
+  /* свайп вниз по ручке закрывает карточку */
+  (() => {
+    const grab = $("grab"), sheet = $("sheet");
+    let startY = null, dy = 0;
+    grab.addEventListener("pointerdown", (e) => { startY = e.clientY; grab.setPointerCapture(e.pointerId); });
+    grab.addEventListener("pointermove", (e) => {
+      if (startY === null) return;
+      dy = Math.max(0, e.clientY - startY);
+      sheet.style.transition = "none";
+      sheet.style.transform = "translateY(" + dy + "px)";
+    });
+    grab.addEventListener("pointerup", () => {
+      sheet.style.transition = "";
+      sheet.style.transform = "";
+      if (dy > 90) closeSheet();
+      startY = null; dy = 0;
+    });
+  })();
+
+  /* кнопка слегка тянется за пальцем или курсором */
+  const buyBtn = $("buy");
+  buyBtn.addEventListener("pointermove", (e) => {
+    if (e.pointerType !== "mouse") return;
+    const r = buyBtn.getBoundingClientRect();
+    buyBtn.style.transform = "translate(" + (e.clientX - r.left - r.width / 2) * 0.05 + "px," + (e.clientY - r.top - r.height / 2) * 0.12 + "px)";
+  });
+  buyBtn.addEventListener("pointerleave", () => { buyBtn.style.transform = ""; });
+
+  moveInd();
+  load();
+})();
+</script>
+</body>
+</html>
