@@ -1,0 +1,25 @@
+{
+ "bot": "celebrityusers_bot",
+ "items": [
+  {
+   "u": "primer_one",
+   "p": 3000
+  },
+  {
+   "u": "demo_name",
+   "p": 4500
+  },
+  {
+   "u": "sample77",
+   "p": 1500
+  },
+  {
+   "u": "test_brand",
+   "p": 12000
+  },
+  {
+   "u": "my_shop_ru",
+   "p": 2500
+  }
+ ]
+}
